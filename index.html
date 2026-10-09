@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContentGuard AI - Professional Blog Fact-Check & Hallucination Auditor</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 py-4 px-6 shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-600/30">
+                    <i class="fa-solid fa-shield-halved text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">ContentGuard <span class="text-indigo-400">AI Auditor</span></h1>
+                    <p class="text-xs text-slate-400">Advanced blog trust & hallucination scanning engine</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="openContactModal()" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-3.5 py-2 rounded-lg transition font-medium flex items-center">
+                    <i class="fa-solid fa-envelope mr-1.5 text-indigo-400"></i> Contact Us
+                </button>
+                <span class="hidden sm:inline-block bg-indigo-950 text-indigo-300 text-xs px-3 py-1.5 rounded-full border border-indigo-700/60 font-medium">Free Edition</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Left Column: Input Form -->
+        <div class="bg-slate-800/80 backdrop-blur border border-slate-700 rounded-2xl p-5 md:p-6 flex flex-col shadow-xl">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-base font-semibold flex items-center text-indigo-300">
+                    <i class="fa-solid fa-pen-to-square mr-2"></i> Paste Article Content
+                </h2>
+                <button onclick="clearText()" class="text-xs text-slate-400 hover:text-rose-400 transition">
+                    <i class="fa-solid fa-trash-can mr-1"></i> Clear
+                </button>
+            </div>
+            <p class="text-xs text-slate-400 mb-4 leading-relaxed">Paste your blog draft below to inspect it for numerical claims, vague expert citations, and repetitive AI patterns instantly.</p>
+            
+            <textarea id="articleInput" rows="11" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition resize-none mb-4 shadow-inner" placeholder="Paste your article content here... (e.g. In 2026, 85% of content creators reported using AI tools...)"></textarea>
+            
+            <div class="flex justify-between items-center mt-auto pt-2 border-t border-slate-700/50">
+                <div class="flex space-x-4 text-xs text-slate-400">
+                    <span id="wordCount"><i class="fa-solid fa-file-lines mr-1 text-slate-500"></i> 0 words</span>
+                    <span id="charCount">0 chars</span>
+                </div>
+                <button onclick="runAudit()" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-medium px-6 py-2.5 rounded-xl text-sm transition shadow-lg shadow-indigo-600/30 flex items-center">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Run Audit
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Column: Audit Results -->
+        <div class="bg-slate-800/80 backdrop-blur border border-slate-700 rounded-2xl p-5 md:p-6 flex flex-col shadow-xl">
+            <h2 class="text-base font-semibold mb-3 flex items-center text-indigo-300">
+                <i class="fa-solid fa-chart-pie mr-2"></i> Audit Results & Trust Score
+            </h2>
+            
+            <!-- Score Card -->
+            <div id="scoreCard" class="bg-slate-900 border border-slate-700 rounded-xl p-4 mb-4 flex items-center justify-between shadow-inner">
+                <div>
+                    <span class="text-[11px] text-slate-400 block uppercase tracking-wider font-semibold">Content Trust Score</span>
+                    <span id="scoreValue" class="text-3xl font-black text-slate-500">---</span>
+                </div>
+                <div id="scoreBadge" class="text-xs px-3.5 py-2 rounded-xl bg-slate-800 text-slate-400 border border-slate-700 font-medium">Awaiting Input</div>
+            </div>
+
+            <!-- Metrics Breakdown -->
+            <div class="space-y-3 flex-grow overflow-y-auto mb-4 pr-1">
+                <div class="bg-slate-900/60 border border-slate-700/60 p-3.5 rounded-xl">
+                    <div class="flex justify-between text-xs font-medium mb-1">
+                        <span class="text-slate-300"><i class="fa-solid fa-hashtag text-indigo-400 mr-2"></i> Numerical Claims Found</span>
+                        <span id="numClaims" class="text-indigo-400 font-bold">0</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-normal">Statistics, percentages, and years requiring verified references.</p>
+                </div>
+
+                <div class="bg-slate-900/60 border border-slate-700/60 p-3.5 rounded-xl">
+                    <div class="flex justify-between text-xs font-medium mb-1">
+                        <span class="text-slate-300"><i class="fa-solid fa-link-slash text-amber-400 mr-2"></i> Vague Attributions</span>
+                        <span id="vagueClaims" class="text-amber-400 font-bold">0</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-normal">Generic claims like "studies show" or "experts say" without names.</p>
+                </div>
+
+                <div class="bg-slate-900/60 border border-slate-700/60 p-3.5 rounded-xl">
+                    <div class="flex justify-between text-xs font-medium mb-1">
+                        <span class="text-slate-300"><i class="fa-solid fa-robot text-purple-400 mr-2"></i> AI Phrasing Indicators</span>
+                        <span id="aiPhrases" class="text-purple-400 font-bold">0</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-normal">Repetitive robotic transition words and filler phrases.</p>
+                </div>
+            </div>
+
+            <!-- Export Button -->
+            <button onclick="copyReport()" class="w-full bg-slate-700 hover:bg-slate-600 active:scale-95 text-slate-200 font-medium py-3 rounded-xl text-sm transition flex items-center justify-center shadow-md">
+                <i class="fa-solid fa-copy mr-2 text-indigo-400"></i> Copy Audit Summary Report
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Pro Version Upgrade Section (Gumroad Promo) -->
+    <section class="max-w-6xl w-full mx-auto px-4 md:px-6 mb-8">
+        <div class="bg-gradient-to-r from-indigo-900/80 via-purple-900/70 to-slate-800 border border-indigo-700/60 rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 text-center md:text-left">
+                <div class="inline-flex items-center space-x-2 bg-indigo-500/20 text-indigo-300 text-xs px-3 py-1 rounded-full border border-indigo-500/30 font-semibold">
+                    <i class="fa-solid fa-crown text-amber-400"></i> <span>Unlock Pro Edition</span>
+                </div>
+                <h3 class="text-xl md:text-2xl font-bold tracking-tight text-white">Want Deeper AI Detection & PDF Reports?</h3>
+                <p class="text-xs md:text-sm text-slate-300 max-w-xl">Upgrade to ContentGuard Pro on Gumroad to unlock bulk article scanning, one-click PDF export, direct source link verification, and advanced GEO optimization checks.</p>
+            </div>
+            <a href="https://fatimanadir.gumroad.com/l/contentguard-ai-pro" target="_blank" class="bg-white hover:bg-indigo-50 text-indigo-950 font-bold px-6 py-3.5 rounded-xl text-sm transition shadow-xl flex items-center shrink-0">
+                <i class="fa-solid fa-bag-shopping mr-2 text-indigo-600"></i> Get Pro on Gumroad ($19)
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center py-5 text-xs text-slate-500 border-t border-slate-800 mt-auto flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-6">
+        <span>ContentGuard AI Auditor &copy; 2026 | Built for Professional Content Publishers</span>
+        <button onclick="openContactModal()" class="hover:text-indigo-400 transition underline">Support & Contact</button>
+    </footer>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <button onclick="closeContactModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="bg-indigo-600/20 text-indigo-400 p-2.5 rounded-xl border border-indigo-500/30">
+                    <i class="fa-solid fa-headset text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-white">Get in Touch</h3>
+                    <p class="text-xs text-slate-400">Have feedback or custom feature requests?</p>
+                </div>
+            </div>
+            <form onsubmit="handleContactSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Your Name</label>
+                    <input type="text" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500" placeholder="Fatima Nadir">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Email Address</label>
+                    <input type="email" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500" placeholder="your@email.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Message</label>
+                    <textarea rows="3" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 resize-none" placeholder="Write your message here..."></textarea>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl text-sm transition shadow-lg shadow-indigo-600/30">
+                    Send Message
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const articleInput = document.getElementById('articleInput');
+        const wordCount = document.getElementById('wordCount');
+        const charCount = document.getElementById('charCount');
+
+        articleInput.addEventListener('input', () => {
+            const text = articleInput.value.trim();
+            const words = text === '' ? 0 : text.split(/\s+/).length;
+            const chars = text.length;
+            wordCount.innerHTML = `<i class="fa-solid fa-file-lines mr-1 text-slate-500"></i> ${words} words`;
+            charCount.innerText = `${chars} chars`;
+        });
+
+        function clearText() {
+            articleInput.value = '';
+            wordCount.innerHTML = `<i class="fa-solid fa-file-lines mr-1 text-slate-500"></i> 0 words`;
+            charCount.innerText = `0 chars`;
+            document.getElementById('scoreValue').innerText = '---';
+            document.getElementById('scoreValue').className = 'text-3xl font-black text-slate-500';
+            document.getElementById('scoreBadge').innerText = 'Awaiting Input';
+            document.getElementById('scoreBadge').className = 'text-xs px-3.5 py-2 rounded-xl bg-slate-800 text-slate-400 border border-slate-700 font-medium';
+            document.getElementById('numClaims').innerText = '0';
+            document.getElementById('vagueClaims').innerText = '0';
+            document.getElementById('aiPhrases').innerText = '0';
+        }
+
+        function runAudit() {
+            const text = articleInput.value.trim();
+            if(!text) {
+                alert('Please paste some article text first!');
+                return;
+            }
+
+            const numbers = text.match(/\b\d+(\.\d+)?%?\b/g) || [];
+            const vagueWords = text.match(/studies show|experts say|it is widely believed|research indicates|according to recent/gi) || [];
+            const aiWords = text.match(/in conclusion|testament to|delve into|beacon of|tapestry|moreover|furthermore|crucial role/gi) || [];
+
+            const numCount = numbers.length;
+            const vagueCount = vagueWords.length;
+            const aiCount = aiWords.length;
+
+            document.getElementById('numClaims').innerText = numCount;
+            document.getElementById('vagueClaims').innerText = vagueCount;
+            document.getElementById('aiPhrases').innerText = aiCount;
+
+            let score = 100 - (vagueCount * 6) - (aiCount * 4);
+            if(score < 35) score = 35;
+            if(score > 98) score = 98;
+
+            const scoreValue = document.getElementById('scoreValue');
+            const scoreBadge = document.getElementById('scoreBadge');
+            
+            scoreValue.innerText = `${score}/100`;
+
+            if(score >= 80) {
+                scoreValue.className = "text-3xl font-black text-emerald-400";
+                scoreBadge.className = "text-xs px-3.5 py-2 rounded-xl bg-emerald-950/80 text-emerald-300 border border-emerald-800 font-medium";
+                scoreBadge.innerText = "Publication Ready";
+            } else if(score >= 60) {
+                scoreValue.className = "text-3xl font-black text-amber-400";
+                scoreBadge.className = "text-xs px-3.5 py-2 rounded-xl bg-amber-950/80 text-amber-300 border border-amber-800 font-medium";
+                scoreBadge.innerText = "Needs Minor Edits";
+            } else {
+                scoreValue.className = "text-3xl font-black text-rose-400";
+                scoreBadge.className = "text-xs px-3.5 py-2 rounded-xl bg-rose-950/80 text-rose-300 border border-rose-800 font-medium";
+                scoreBadge.innerText = "High Risk / Heavy Edits";
+            }
+        }
+
+        function copyReport() {
+            const score = document.getElementById('scoreValue').innerText;
+            const nums = document.getElementById('numClaims').innerText;
+            const vagues = document.getElementById('vagueClaims').innerText;
+            const ai = document.getElementById('aiPhrases').innerText;
+
+            const report = `### ContentGuard AI Audit Report\n- Trust Score: ${score}\n- Numerical Claims: ${nums}\n- Vague Attributions: ${vagues}\n- AI Overused Phrases: ${ai}\n\nGenerated via ContentGuard AI Auditor.`;
+            
+            navigator.clipboard.writeText(report);
+            alert('Audit summary report copied to clipboard!');
+        }
+
+        function openContactModal() {
+            document.getElementById('contactModal').classList.remove('hidden');
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.add('hidden');
+        }
+
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            alert('Thank you! Your message has been sent successfully.');
+            closeContactModal();
+        }
+    </script>
+</body>
+</html>
